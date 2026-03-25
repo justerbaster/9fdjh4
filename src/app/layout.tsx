@@ -9,10 +9,6 @@ export const metadata: Metadata = {
   title: "Solana Is Dead | Every Solana Obituary Since 2020",
   description:
     "Solana obituaries since 2020: critics, articles, and SOL price at each death call. Updated through March 2026.",
-  icons: {
-    icon: "/favicon.png",
-    apple: "/favicon.png",
-  },
 };
 
 export default function RootLayout({
