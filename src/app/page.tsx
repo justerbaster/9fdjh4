@@ -1,65 +1,179 @@
-import Image from "next/image";
+import DeathChart from "@/components/DeathChart";
+import { obituaries } from "@/data/deaths";
 
-export default function Home() {
+function groupByYear(obits: typeof obituaries) {
+  const groups: Record<string, typeof obituaries> = {};
+  for (const o of obits) {
+    const year = o.date.slice(0, 4);
+    if (!groups[year]) groups[year] = [];
+    groups[year].push(o);
+  }
+  return groups;
+}
+
+export default function HomePage() {
+  const total = obituaries.length;
+  const grouped = groupByYear(obituaries);
+  const years = Object.keys(grouped).sort();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div
+      style={{
+        maxWidth: "var(--container-max)",
+        margin: "0 auto",
+        padding: "0 24px 40px",
+        position: "relative",
+      }}
+    >
+      <DeathChart />
+
+      {/* Year-by-year breakdown */}
+      <div
+        style={{
+          marginTop: 24,
+          background: "var(--color-bg-card)",
+          borderRadius: "var(--radius-2xl)",
+          padding: "1.5rem 1.25rem",
+          border: "1px solid var(--color-border)",
+        }}
+      >
+        <div
+          style={{
+            marginBottom: "1.25rem",
+            paddingBottom: "1rem",
+            borderBottom: "1px solid var(--color-border-light)",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "1.375rem",
+              fontWeight: 700,
+              color: "var(--color-text-primary)",
+              margin: "0 0 0.375rem 0",
+              lineHeight: 1.1,
+            }}
+          >
+            Obituaries by Year
+          </h2>
+          <p style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)", margin: 0 }}>
+            {total} death declarations tracked since 2020
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Year cards */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {years.map((year) => {
+            const items = grouped[year];
+            const sorted = [...items].sort((a, b) => a.date.localeCompare(b.date));
+            return (
+              <div
+                key={year}
+                style={{
+                  border: "1px solid var(--color-border-light)",
+                  borderRadius: "var(--radius-xl)",
+                  overflow: "hidden",
+                }}
+              >
+                {/* Year header */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "14px 16px",
+                    background: "var(--color-bg-tertiary)",
+                    borderBottom: "1px solid var(--color-border-light)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                    <span
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: 900,
+                        color: "var(--color-text-primary)",
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {year}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        color: "var(--color-text-tertiary)",
+                      }}
+                    >
+                      {items.length} obituar{items.length === 1 ? "y" : "ies"}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <span style={{ color: "var(--color-accent)", fontWeight: 700, fontSize: "1.25rem" }}>
+                      {items.length}
+                    </span>
+                    <span style={{ fontSize: "0.6875rem", color: "var(--color-text-tertiary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Deaths
+                    </span>
+                  </div>
+                </div>
+
+                {/* Entries list */}
+                <div>
+                  {sorted.map((death, i) => (
+                    <a
+                      key={death.id}
+                      href={death.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 12,
+                        padding: "12px 16px",
+                        borderBottom: i < sorted.length - 1 ? "1px solid var(--color-border-light)" : "none",
+                        textDecoration: "none",
+                        transition: "var(--transition-fast)",
+                        cursor: "pointer",
+                      }}
+                      className="card-hoverable"
+                    >
+                      <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1, color: "var(--color-accent)" }}>☠</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, flexWrap: "wrap" }}>
+                          <time style={{ fontSize: "0.6875rem", color: "var(--color-text-tertiary)" }}>
+                            {new Date(death.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </time>
+                          <span style={{ fontSize: "0.6875rem", color: "var(--color-accent)", fontWeight: 600 }}>
+                            ${death.solPrice}
+                          </span>
+                        </div>
+                        <p style={{
+                          fontSize: "0.8125rem",
+                          fontWeight: 600,
+                          color: "var(--color-text-primary)",
+                          lineHeight: 1.3,
+                          marginBottom: 2,
+                        }}>
+                          {death.title}
+                        </p>
+                        <p style={{ fontSize: "0.6875rem", color: "var(--color-text-secondary)" }}>
+                          {death.author} · {death.source}
+                        </p>
+                      </div>
+                      <span style={{ fontSize: "0.75rem", color: "var(--color-accent)", flexShrink: 0, marginTop: 2 }}>→</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
